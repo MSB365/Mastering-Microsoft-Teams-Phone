@@ -1,0 +1,14 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 1.2 - Checking a phone number assignment
+# Chapter 1 - Teams Phone Architecture  |  Section: 1.8 Where Configuration Lives: Users, Numbers and Policies
+# Book page: 19
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Get-CsPhoneNumberAssignment -TelephoneNumber "+41441234567" |
+    Select-Object TelephoneNumber, NumberType, ActivationState,
+        PstnAssignmentStatus, AssignedPstnTargetId, Capability

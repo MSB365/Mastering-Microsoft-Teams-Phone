@@ -1,0 +1,40 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.10 - Exporting the voice configuration to JSON
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.9 Exporting the Voice Configuration
+# Book page: 160
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+param([string]$OutPath = ".\export\$(Get-Date -Format yyyy-MM-dd)")
+New-Item -ItemType Directory -Path $OutPath -Force | Out-Null
+
+$items = [ordered]@{
+    "PstnGateways"        = { Get-CsOnlinePSTNGateway }
+    "PstnUsages"          = { (Get-CsOnlinePstnUsage).Usage }
+    "VoiceRoutes"         = { Get-CsOnlineVoiceRoute }
+    "VoiceRoutingPolicies"= { Get-CsOnlineVoiceRoutingPolicy }
+    "TranslationRules"    = { Get-CsTeamsTranslationRule }
+    "TenantDialPlans"     = { Get-CsTenantDialPlan }
+    "CallingPolicies"     = { Get-CsTeamsCallingPolicy }
+    "CallerIdPolicies"    = { Get-CsCallingLineIdentity }
+    "EmergencyCalling"    = { Get-CsTeamsEmergencyCallingPolicy }
+    "EmergencyRouting"    = { Get-CsTeamsEmergencyCallRoutingPolicy }
+    "AutoAttendants"      = { Get-CsAutoAttendant }
+    "CallQueues"          = { Get-CsCallQueue }
+    "ResourceAccounts"    = { Get-CsOnlineApplicationInstance }
+    "NetworkSites"        = { Get-CsTenantNetworkSite }
+    "NetworkSubnets"      = { Get-CsTenantNetworkSubnet }
+    "TrustedIPs"          = { Get-CsTenantTrustedIPAddress }
+}
+
+foreach ($name in $items.Keys) {
+    try {
+        & $items[$name] | ConvertTo-Json -Depth 10 |
+            Set-Content -Path (Join-Path $OutPath "$name.json") -Encoding UTF8
+        Write-Host "Exported $name"
+    } catch { Write-Warning "$name failed: $($_.Exception.Message)" }
+}

@@ -1,0 +1,41 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 17.1 - Collecting the voice configuration facts for one user
+# Chapter 17 - The Troubleshooting Playbook  |  Section: 17.6 Playbooks
+# Book page: 206
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+function Test-VoiceUser {
+    param([Parameter(Mandatory)][string]$Upn, [string]$TestNumber = "+41441234567")
+
+    $u = Get-CsOnlineUser -Identity $Upn
+    "User              : {0}" -f $u.UserPrincipalName
+    "Account enabled   : {0}" -f $u.AccountEnabled
+    "Usage location    : {0}" -f $u.UsageLocation
+    "PhoneSystem       : {0}" -f ($u.FeatureTypes -contains "PhoneSystem")
+    "Enterprise Voice  : {0}" -f $u.EnterpriseVoiceEnabled
+    "LineUri           : {0}" -f $u.LineUri
+
+    $num = Get-CsPhoneNumberAssignment -AssignedPstnTargetId $u.Identity
+    "Number type       : {0}" -f ($num.NumberType -join ", ")
+
+    $norm = Get-CsEffectiveTenantDialPlan -Identity $Upn |
+            Test-CsEffectiveTenantDialPlan -DialedNumber $TestNumber
+    "Normalized number : {0}" -f $norm.TranslatedNumber
+
+    if ($num.NumberType -contains "DirectRouting") {
+        $vrpName = if ($u.OnlineVoiceRoutingPolicy) { "Tag:$($u.OnlineVoiceRoutingPolicy)" } else { "Global" }
+        $usages  = (Get-CsOnlineVoiceRoutingPolicy -Identity $vrpName).OnlinePstnUsages
+        "Voice routing pol.: {0} -> {1}" -f $vrpName, ($usages -join ", ")
+        $target = if ($norm.TranslatedNumber) { $norm.TranslatedNumber } else { $TestNumber }
+        Get-CsOnlineVoiceRoute | Where-Object {
+            ($_.OnlinePstnUsages | Where-Object { $usages -contains $_ }) -and $target -match $_.NumberPattern
+        } | Sort-Object Priority | Select-Object Identity, Priority, NumberPattern, OnlinePstnGatewayList
+    }
+}
+
+Test-VoiceUser -Upn "anna.meier@contoso.com" -TestNumber "0791234567"

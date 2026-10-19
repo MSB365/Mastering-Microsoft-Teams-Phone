@@ -1,0 +1,12 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.7 - Enabling media bypass on a gateway
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.7 Media Bypass
+# Book page: 84
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Set-CsOnlinePSTNGateway -Identity "sbc01.contoso.com" -MediaBypass $true

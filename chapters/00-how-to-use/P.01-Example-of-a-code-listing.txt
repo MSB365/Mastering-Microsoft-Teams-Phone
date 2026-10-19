@@ -1,0 +1,16 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing P.1 - Example of a code listing
+# How to Use This Book
+# Book page: xvi
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# A typical listing: variables first, then the commands
+$upn = "anna.meier@contoso.com"
+
+Get-CsOnlineUser -Identity $upn |
+    Select-Object UserPrincipalName, LineUri, FeatureTypes

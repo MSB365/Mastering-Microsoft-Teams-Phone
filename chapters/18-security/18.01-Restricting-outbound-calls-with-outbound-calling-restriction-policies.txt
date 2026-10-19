@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 18.1 - Restricting outbound calls with outbound calling restriction policies
+# Chapter 18 - Security and Compliance  |  Section: 18.3 Toll Fraud
+# Book page: 214
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Which restriction policies exist?
+Get-CsOnlineDialOutPolicy | Select-Object Identity
+
+# Domestic PSTN calls only, no dial-out from meetings, as the organization default
+Grant-CsDialoutPolicy -Global -PolicyName "DialoutCPCDisabledPSTNDomestic"
+
+# International calls for a group that needs them, for example sales
+Grant-CsDialoutPolicy -Group "sg-voice-international@contoso.com" -Rank 10 `
+    -PolicyName "DialoutCPCandPSTNInternational"

@@ -1,0 +1,15 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 12.1 - An IP phone policy for hot-desking phones
+# Chapter 12 - Devices  |  Section: 12.2 Teams Phones
+# Book page: 139
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsIPPhonePolicy -Identity "IPP-HotDesk" -SignInMode CommonAreaPhoneSignIn `
+    -AllowHotDesking $true -HotDeskingIdleTimeoutInMinutes 120
+
+Grant-CsTeamsIPPhonePolicy -Identity "desk-3-12@contoso.com" -PolicyName "IPP-HotDesk"

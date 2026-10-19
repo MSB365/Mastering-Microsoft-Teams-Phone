@@ -1,0 +1,23 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 7.5 - Updating the emergency location of Calling Plan numbers
+# Chapter 7 - Setting up Operator Connect and Calling Plans  |  Section: 7.7 Changing Emergency Addresses and Releasing Numbers
+# Book page: 95
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$newLoc = Get-CsOnlineLisLocation | Where-Object { $_.Location -eq "Bern, 2nd floor" }
+
+# Change the emergency location of a single number
+Set-CsPhoneNumberAssignment -PhoneNumber "+41441234567" -LocationId $newLoc.LocationId
+
+# Change it for all numbers of the users in a CSV file
+Import-Csv .\moved-users.csv | ForEach-Object {
+    $pn = Get-CsPhoneNumberAssignment -AssignedPstnTargetId $_.UPN -NumberType CallingPlan
+    if ($pn) {
+        Set-CsPhoneNumberAssignment -PhoneNumber $pn.TelephoneNumber -LocationId $newLoc.LocationId
+    }
+}

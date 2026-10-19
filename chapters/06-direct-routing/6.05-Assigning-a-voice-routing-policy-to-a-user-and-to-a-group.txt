@@ -1,0 +1,17 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.5 - Assigning a voice routing policy to a user and to a group
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.4 Configuring Voice Routing
+# Book page: 81
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Grant-CsOnlineVoiceRoutingPolicy -Identity "anna.meier@contoso.com" `
+    -PolicyName "VRP-CH-International"
+
+# Assign to a group with a rank (lower rank = higher priority)
+Grant-CsOnlineVoiceRoutingPolicy -Group "voice-ch-intl@contoso.com" `
+    -PolicyName "VRP-CH-International" -Rank 10

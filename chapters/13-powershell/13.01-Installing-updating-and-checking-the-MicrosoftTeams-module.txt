@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.1 - Installing, updating and checking the MicrosoftTeams module
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.2 Installing and Updating the Module
+# Book page: 150
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Install for the current user (no administrator rights needed)
+Install-Module -Name MicrosoftTeams -Scope CurrentUser
+
+# Update later; close all sessions that have the module loaded first
+Update-Module -Name MicrosoftTeams
+
+# Which versions are installed?
+Get-InstalledModule -Name MicrosoftTeams -AllVersions | Select-Object Name, Version

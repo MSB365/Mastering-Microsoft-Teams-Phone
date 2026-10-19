@@ -1,0 +1,26 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.6 - A runbook that exports routes and stores them in Azure Storage
+# Chapter 15 - Configuration as Code  |  Section: 15.8 Running It on a Schedule
+# Book page: 183
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-AzAccount -Identity | Out-Null
+Connect-MicrosoftTeams -Identity | Out-Null
+
+$date = Get-Date -Format "yyyy-MM-dd"
+$tmp  = Join-Path $env:TEMP "export-$date"
+New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+
+Get-CsOnlineVoiceRoute | ConvertTo-Json -Depth 10 | Set-Content "$tmp\VoiceRoutes.json"
+# ... further objects as in Listing 13.10 ...
+
+$ctx = New-AzStorageContext -StorageAccountName "stvoiceops" -UseConnectedAccount
+Get-ChildItem $tmp -File | ForEach-Object {
+    Set-AzStorageBlobContent -File $_.FullName -Container "exports" `
+        -Blob "$date/$($_.Name)" -Context $ctx -Force | Out-Null
+}

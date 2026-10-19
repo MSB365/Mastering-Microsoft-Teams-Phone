@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.8 - Direct Routing calls of the last day, grouped by final SIP code
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.10 Monitoring Direct Routing
+# Book page: 86
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Requires the application permission CallRecords.Read.All
+$from = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
+$to   = (Get-Date).ToString("yyyy-MM-dd")
+$uri  = "https://graph.microsoft.com/v1.0/communications/callRecords/" +
+        "getDirectRoutingCalls(fromDateTime=$from,toDateTime=$to)"
+
+$calls = (Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject).value
+$calls | Group-Object finalSipCode | Select-Object Name, Count

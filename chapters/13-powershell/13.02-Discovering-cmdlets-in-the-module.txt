@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.2 - Discovering cmdlets in the module
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.3 How the Module Works
+# Book page: 151
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# All Cs cmdlets in the module, grouped by verb
+Get-Command -Module MicrosoftTeams -Noun Cs* | Group-Object Verb | Select-Object Name, Count
+
+# Find cmdlets for a topic
+Get-Command -Module MicrosoftTeams -Noun *VoiceRoute*
+Get-Command -Module MicrosoftTeams -Noun *PhoneNumber*
+
+# Full help with examples
+Get-Help Set-CsPhoneNumberAssignment -Examples

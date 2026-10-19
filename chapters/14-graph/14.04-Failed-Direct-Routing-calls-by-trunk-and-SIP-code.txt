@@ -1,0 +1,25 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.4 - Failed Direct Routing calls by trunk and SIP code
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.5 PSTN and Direct Routing Logs
+# Book page: 168
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$from = (Get-Date).ToUniversalTime().AddDays(-7).ToString("yyyy-MM-dd")
+$to   = (Get-Date).ToUniversalTime().AddDays(1).ToString("yyyy-MM-dd")
+$uri  = "https://graph.microsoft.com/v1.0/communications/callRecords/" +
+        "getDirectRoutingCalls(fromDateTime=$from,toDateTime=$to)"
+
+$calls  = Get-GraphAll -Uri $uri
+$failed = $calls | Where-Object { -not $_.successfulCall }
+
+"{0} calls, {1} failed ({2:P1})" -f $calls.Count, $failed.Count,
+    ($(if ($calls.Count) { $failed.Count / $calls.Count } else { 0 }))
+
+$failed | Group-Object trunkFullyQualifiedDomainName, finalSipCode, finalSipCodePhrase |
+    Sort-Object Count -Descending |
+    Select-Object Count, Name -First 15

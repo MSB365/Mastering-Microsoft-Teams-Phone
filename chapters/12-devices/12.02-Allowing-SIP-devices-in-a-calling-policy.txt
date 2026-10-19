@@ -1,0 +1,12 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 12.2 - Allowing SIP devices in a calling policy
+# Chapter 12 - Devices  |  Section: 12.5 SIP Gateway
+# Book page: 141
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Set-CsTeamsCallingPolicy -Identity "CP-Standard" -AllowSIPDevicesCalling $true

@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.1 - A standard calling policy
+# Chapter 10 - Calling Features  |  Section: 10.1 Calling Policies
+# Book page: 120
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsCallingPolicy -Identity "CP-Standard" `
+    -AllowPrivateCalling $true `
+    -AllowCallForwardingToUser $true `
+    -AllowCallForwardingToPhone $false `
+    -AllowVoicemail UserOverride `
+    -AllowCallGroups $true `
+    -AllowDelegation $true `
+    -BusyOnBusyEnabledType UserOverride `
+    -AllowWebPSTNCalling $false
+
+Grant-CsTeamsCallingPolicy -Group "voice-users@contoso.com" -PolicyName "CP-Standard" -Rank 10

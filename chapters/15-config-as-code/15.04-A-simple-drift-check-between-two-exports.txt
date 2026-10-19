@@ -1,0 +1,33 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.4 - A simple drift check between two exports
+# Chapter 15 - Configuration as Code  |  Section: 15.6 Detecting Drift
+# Book page: 181
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+function Compare-VoiceExport {
+    param([string]$BaselineFile, [string]$CurrentFile, [string]$Key = "Identity")
+
+    $toMap = {
+        param($items)
+        $m = @{}
+        foreach ($i in @($items)) { $m[[string]$i.$Key] = ($i | ConvertTo-Json -Depth 10 -Compress) }
+        $m
+    }
+    $base = & $toMap (Get-Content $BaselineFile -Raw | ConvertFrom-Json)
+    $curr = & $toMap (Get-Content $CurrentFile  -Raw | ConvertFrom-Json)
+
+    foreach ($k in $curr.Keys) {
+        if (-not $base.ContainsKey($k))  { [pscustomobject]@{ Object = $k; Change = "Added" } }
+        elseif ($base[$k] -ne $curr[$k]) { [pscustomobject]@{ Object = $k; Change = "Modified" } }
+    }
+    foreach ($k in $base.Keys) {
+        if (-not $curr.ContainsKey($k)) { [pscustomobject]@{ Object = $k; Change = "Removed" } }
+    }
+}
+
+Compare-VoiceExport -BaselineFile .\baseline\VoiceRoutes.json -CurrentFile .\export\VoiceRoutes.json

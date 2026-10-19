@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 3.1 - Overview of number types and Direct Routing gateways
+# Chapter 3 - PSTN Connectivity Options Compared  |  Section: 3.9 Mixing Models in One Tenant
+# Book page: 47
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+# Overview of assigned numbers by type and target
+Get-CsPhoneNumberAssignment |
+    Group-Object NumberType, PstnAssignmentStatus |
+    Select-Object Count, Name |
+    Sort-Object Name
+
+# Direct Routing gateways in the tenant
+Get-CsOnlinePSTNGateway |
+    Select-Object Identity, Enabled, SipSignalingPort, MediaBypass

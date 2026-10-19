@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 18.5 - Assigning a compliance recording policy
+# Chapter 18 - Security and Compliance  |  Section: 18.6 Call Recording
+# Book page: 218
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsComplianceRecordingPolicy -Identity "CR-Trading" -Enabled $true `
+    -Description "Compliance recording for trading desk"
+
+Set-CsTeamsComplianceRecordingPolicy -Identity "CR-Trading" -ComplianceRecordingApplications @(
+    New-CsTeamsComplianceRecordingApplication -Parent "CR-Trading" `
+        -Id "<object ID of the recorder resource account>" `
+        -RequiredBeforeCallEstablishment $true -RequiredDuringCall $true
+)
+
+Grant-CsTeamsComplianceRecordingPolicy -Identity "trader01@contoso.com" -PolicyName "CR-Trading"

@@ -1,0 +1,18 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 22.1 - Enabling Location-Based Routing on network sites (Direct Routing)
+# Chapter 22 - Real-World Scenarios  |  Section: 22.3 Scenario C: A Multinational with a Regulated Country
+# Book page: 257
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Direct Routing variant: enable Location-Based Routing for the service center sites
+Set-CsTenantNetworkSite -Identity "IN-PUNE-SC1" -EnableLocationBasedRouting $true
+Set-CsTenantNetworkSite -Identity "IN-PUNE-SC2" -EnableLocationBasedRouting $true
+
+# Verify subnet coverage: every subnet of the site must be defined
+Get-CsTenantNetworkSubnet | Where-Object NetworkSiteID -like "IN-PUNE-*" |
+    Select-Object SubnetID, MaskBits, NetworkSiteID

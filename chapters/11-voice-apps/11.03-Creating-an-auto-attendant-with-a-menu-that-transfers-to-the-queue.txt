@@ -1,0 +1,22 @@
+﻿# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 11.3 - Creating an auto attendant with a menu that transfers to the queue
+# Chapter 11 - Voice Applications  |  Section: 11.7 Building Voice Applications with PowerShell
+# Book page: 134
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$cqTarget = New-CsAutoAttendantCallableEntity -Identity $ra.ObjectId -Type ApplicationEndpoint
+
+$greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt "Willkommen bei Contoso."
+$menuText = New-CsAutoAttendantPrompt -TextToSpeechPrompt "Für den Verkauf drücken Sie die 1."
+$option1  = New-CsAutoAttendantMenuOption -Action TransferCallToTarget `
+              -DtmfResponse Tone1 -CallTarget $cqTarget
+$menu     = New-CsAutoAttendantMenu -Name "Hauptmenü" -MenuOptions @($option1) -Prompts @($menuText)
+$flow     = New-CsAutoAttendantCallFlow -Name "Business hours" -Greetings @($greeting) -Menu $menu
+
+$aa = New-CsAutoAttendant -Name "Contoso Main" -LanguageId "de-CH" `
+    -TimeZoneId "W. Europe Standard Time" -DefaultCallFlow $flow

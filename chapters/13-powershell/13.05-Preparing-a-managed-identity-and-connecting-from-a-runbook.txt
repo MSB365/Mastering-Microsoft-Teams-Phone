@@ -1,0 +1,27 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.5 - Preparing a managed identity and connecting from a runbook
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.4 Connecting
+# Book page: 154
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Run once by an administrator: grant the managed identity what it needs
+Connect-MgGraph -Scopes "AppRoleAssignment.ReadWrite.All","RoleManagement.ReadWrite.Directory"
+
+$mi      = Get-MgServicePrincipal -Filter "displayName eq 'voice-automation'"
+$graphSp = Get-MgServicePrincipal -Filter "appId eq '00000003-0000-0000-c000-000000000000'"
+$appRole = $graphSp.AppRoles | Where-Object { $_.Value -eq "Organization.Read.All" -and
+                                            $_.AllowedMemberTypes -contains "Application" }
+New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $mi.Id `
+    -PrincipalId $mi.Id -ResourceId $graphSp.Id -AppRoleId $appRole.Id
+
+$role = Get-MgRoleManagementDirectoryRoleDefinition -Filter "displayName eq 'Teams Telephony Administrator'"
+New-MgRoleManagementDirectoryRoleAssignment -PrincipalId $mi.Id `
+    -RoleDefinitionId $role.Id -DirectoryScopeId "/"
+
+# In the runbook
+Connect-MicrosoftTeams -Identity

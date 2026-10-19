@@ -1,0 +1,2 @@
+NetworkIP, NetworkName, NetworkRange, BuildingName, OwnershipType, BuildingType,
+BuildingOfficeType, City, ZipCode, Country, State, Region, InsideCorp, ExpressRoute, VPN

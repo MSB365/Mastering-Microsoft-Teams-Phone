@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.8 - Resolving number owners with a lookup table
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.6 Working Efficiently in Large Tenants
+# Book page: 156
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$users = Get-CsOnlineUser -Properties Identity, UserPrincipalName -ResultSize Unlimited
+$byId  = @{}
+foreach ($u in $users) { $byId[[string]$u.Identity] = $u.UserPrincipalName }
+
+Get-CsPhoneNumberAssignment | ForEach-Object {
+    [pscustomobject]@{
+        Number = $_.TelephoneNumber
+        Type   = $_.NumberType
+        User   = $byId[[string]$_.AssignedPstnTargetId]
+    }
+}

@@ -1,0 +1,18 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 9.1 - Working with emergency addresses and places in PowerShell
+# Chapter 9 - Emergency Calling  |  Section: 9.3 Emergency Addresses and Places
+# Book page: 112
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# List addresses and their places
+Get-CsOnlineLisCivicAddress | Select-Object CivicAddressId, CompanyName, City, Description
+Get-CsOnlineLisLocation    | Select-Object LocationId, CivicAddressId, Location, City
+
+# Add a place (floor) to an existing address
+$addr = Get-CsOnlineLisCivicAddress | Where-Object { $_.Description -eq "Zurich HQ" }
+New-CsOnlineLisLocation -CivicAddressId $addr.CivicAddressId -Location "3rd floor"

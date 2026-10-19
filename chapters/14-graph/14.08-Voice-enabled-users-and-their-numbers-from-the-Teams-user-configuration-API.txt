@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.8 - Voice-enabled users and their numbers from the Teams user configuration API
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.8 Teams Administration APIs
+# Book page: 171
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$uri   = "https://graph.microsoft.com/v1.0/admin/teams/userConfigurations"
+$users = Get-GraphAll -Uri $uri
+
+$users | Where-Object { $_.isEnterpriseVoiceEnabled } | ForEach-Object {
+    [pscustomobject]@{
+        UPN     = $_.userPrincipalName
+        Type    = $_.accountType
+        Numbers = ($_.telephoneNumbers.telephoneNumber -join ", ")
+    }
+} | Sort-Object UPN | Format-Table -AutoSize

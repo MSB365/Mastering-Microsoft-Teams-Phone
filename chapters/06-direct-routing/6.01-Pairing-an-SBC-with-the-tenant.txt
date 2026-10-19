@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.1 - Pairing an SBC with the tenant
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.2 Pairing the SBC with Teams
+# Book page: 78
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+New-CsOnlinePSTNGateway -Fqdn "sbc01.contoso.com" `
+    -SipSignalingPort 5061 `
+    -MaxConcurrentSessions 100 `
+    -ForwardCallHistory $true `
+    -Enabled $true
+
+Get-CsOnlinePSTNGateway -Identity "sbc01.contoso.com"

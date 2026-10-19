@@ -1,0 +1,14 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 18.4 - Allowing end-to-end encryption for one-to-one calls
+# Chapter 18 - Security and Compliance  |  Section: 18.5 Encryption
+# Book page: 217
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Allow users to turn on E2EE for one-to-one calls in their settings
+Set-CsTeamsEnhancedEncryptionPolicy -Identity Global `
+    -CallingEndtoEndEncryptionEnabledType DisabledUserOverride

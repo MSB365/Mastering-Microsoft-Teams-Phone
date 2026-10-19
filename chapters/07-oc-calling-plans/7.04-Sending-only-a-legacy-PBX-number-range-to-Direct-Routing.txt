@@ -1,0 +1,16 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 7.4 - Sending only a legacy PBX number range to Direct Routing
+# Chapter 7 - Setting up Operator Connect and Calling Plans  |  Section: 7.6 Calling Plans and Direct Routing in the Same Tenant
+# Book page: 95
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Only calls to the legacy PBX range go to the SBC; everything else uses the Calling Plan
+Set-CsOnlinePstnUsage -Identity Global -Usage @{ Add = "Legacy-PBX" }
+New-CsOnlineVoiceRoute -Identity "Legacy-PBX-Range" -NumberPattern '^\+4144123[5-9]\d{3}$' `
+    -OnlinePstnGatewayList "sbc01.contoso.com" -Priority 1 -OnlinePstnUsages "Legacy-PBX"
+New-CsOnlineVoiceRoutingPolicy -Identity "VRP-CallingPlan-Plus-PBX" -OnlinePstnUsages "Legacy-PBX"

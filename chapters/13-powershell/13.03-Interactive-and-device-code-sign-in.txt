@@ -1,0 +1,18 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.3 - Interactive and device code sign-in
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.4 Connecting
+# Book page: 152
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+# Without a local browser
+Connect-MicrosoftTeams -UseDeviceAuthentication
+
+# Check the session
+Get-CsTenant | Select-Object DisplayName, TenantId

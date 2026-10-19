@@ -1,0 +1,23 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.6 - Enabling a user for Shared Calling
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.10 Enabling Shared Calling Users
+# Book page: 107
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$ra = Get-CsOnlineApplicationInstance -Identity "aa-main@contoso.com"
+
+New-CsTeamsSharedCallingRoutingPolicy -Identity "SC-Zurich" `
+    -ResourceAccount $ra.ObjectId `
+    -EmergencyNumbers @{ Add = "+41441234510", "+41441234511" }
+
+New-CsOnlineVoiceRoutingPolicy -Identity "VRP-SharedCalling" -OnlinePstnUsages @()
+
+$upn = "eva.frei@contoso.com"
+Set-CsPhoneNumberAssignment -Identity $upn -EnterpriseVoiceEnabled $true
+Grant-CsOnlineVoiceRoutingPolicy -Identity $upn -PolicyName "VRP-SharedCalling"
+Grant-CsTeamsSharedCallingRoutingPolicy -Identity $upn -PolicyName "SC-Zurich"

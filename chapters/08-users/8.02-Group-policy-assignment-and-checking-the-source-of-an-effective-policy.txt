@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.2 - Group policy assignment and checking the source of an effective policy
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.5 Policy Precedence and Assignment Methods
+# Book page: 102
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Grant-CsOnlineVoiceRoutingPolicy -Group "voice-ch-intl@contoso.com" `
+    -PolicyName "VRP-CH-International" -Rank 1
+Grant-CsTenantDialPlan -Group "voice-ch-zurich@contoso.com" `
+    -PolicyName "DP-CH-Zurich" -Rank 1
+
+# Which policy is effective for a user, and where does it come from?
+Get-CsUserPolicyAssignment -Identity "anna.meier@contoso.com" -PolicyType OnlineVoiceRoutingPolicy |
+    Select-Object -ExpandProperty PolicySource

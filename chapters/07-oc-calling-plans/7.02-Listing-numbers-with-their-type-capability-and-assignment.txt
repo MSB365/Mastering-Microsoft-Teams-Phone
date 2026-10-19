@@ -1,0 +1,16 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 7.2 - Listing numbers with their type, capability and assignment
+# Chapter 7 - Setting up Operator Connect and Calling Plans  |  Section: 7.3 Number Types and Capacity
+# Book page: 93
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Get-CsPhoneNumberAssignment |
+    Select-Object TelephoneNumber, NumberType, Capability,
+        PstnAssignmentStatus, AssignedPstnTargetId |
+    Sort-Object NumberType, TelephoneNumber |
+    Format-Table -AutoSize

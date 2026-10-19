@@ -1,0 +1,18 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 9.3 - Emergency calling policy for security desk notification
+# Chapter 9 - Emergency Calling  |  Section: 9.5 Emergency Policies
+# Book page: 115
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsEmergencyCallingPolicy -Identity "ECP-Zurich" `
+    -NotificationGroup "security-zurich@contoso.com" `
+    -NotificationMode NotificationOnly
+
+# Assign to a network site (dynamic) and/or to users (static)
+Set-CsTenantNetworkSite -Identity "Zurich" -EmergencyCallingPolicy "ECP-Zurich"
+Grant-CsTeamsEmergencyCallingPolicy -Identity "anna.meier@contoso.com" -PolicyName "ECP-Zurich"

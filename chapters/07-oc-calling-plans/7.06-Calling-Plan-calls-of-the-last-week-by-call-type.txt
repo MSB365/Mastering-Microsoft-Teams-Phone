@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 7.6 - Calling Plan calls of the last week by call type
+# Chapter 7 - Setting up Operator Connect and Calling Plans  |  Section: 7.8 Monitoring Usage and Costs
+# Book page: 96
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Requires the application permission CallRecords.Read.All
+$from = (Get-Date).AddDays(-7).ToString("yyyy-MM-dd")
+$to   = (Get-Date).ToString("yyyy-MM-dd")
+$uri  = "https://graph.microsoft.com/v1.0/communications/callRecords/" +
+        "getPstnCalls(fromDateTime=$from,toDateTime=$to)"
+
+$calls = (Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject).value
+$calls | Group-Object callType | Select-Object Name, Count,
+    @{ n = "Minutes"; e = { [math]::Round(($_.Group | Measure-Object duration -Sum).Sum / 60) } }

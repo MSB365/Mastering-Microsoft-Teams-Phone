@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.9 - Collecting yesterday's PSTN and Direct Routing logs
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.10 A Small Reporting Pipeline
+# Book page: 172
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MgGraph -Identity -NoWelcome
+
+$day  = (Get-Date).ToUniversalTime().Date.AddDays(-1)
+$from = $day.ToString("yyyy-MM-dd")
+$to   = $day.AddDays(1).ToString("yyyy-MM-dd")
+$base = "https://graph.microsoft.com/v1.0/communications/callRecords"
+
+$dr   = Get-GraphAll -Uri "$base/getDirectRoutingCalls(fromDateTime=$from,toDateTime=$to)"
+$pstn = Get-GraphAll -Uri "$base/getPstnCalls(fromDateTime=$from,toDateTime=$to)"
+
+$dr   | Export-Csv ".\dr-$from.csv"   -NoTypeInformation
+$pstn | Export-Csv ".\pstn-$from.csv" -NoTypeInformation
+# Next step (Chapter 15): upload to storage and refresh the report

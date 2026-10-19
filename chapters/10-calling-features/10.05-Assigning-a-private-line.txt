@@ -1,0 +1,16 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.5 - Assigning a private line
+# Chapter 10 - Calling Features  |  Section: 10.5 Private Line
+# Book page: 123
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Set-CsPhoneNumberAssignment -Identity "ceo@contoso.com" `
+    -PhoneNumber "+41441234999" -PhoneNumberType DirectRouting -AssignmentCategory Private
+
+Get-CsPhoneNumberAssignment -AssignedPstnTargetId "ceo@contoso.com" |
+    Select-Object TelephoneNumber, AssignmentCategory

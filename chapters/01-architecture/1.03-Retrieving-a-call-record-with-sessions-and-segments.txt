@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 1.3 - Retrieving a call record with sessions and segments
+# Chapter 1 - Teams Phone Architecture  |  Section: 1.9 The Management and Identity Plane
+# Book page: 20
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Requires an app registration with the application permission
+# CallRecords.Read.All (admin consent required)
+Connect-MgGraph -TenantId $TenantId -ClientId $AppId `
+    -CertificateThumbprint $Thumbprint
+
+$id  = "<call record id>"
+$uri = "https://graph.microsoft.com/v1.0/communications/callRecords/$id" +
+       "?`$expand=sessions(`$expand=segments)"
+
+$record = Invoke-MgGraphRequest -Method GET -Uri $uri
+$record.type                  # peerToPeer or groupCall
+$record.modalities            # audio, video, screenSharing ...
+$record.sessions.Count

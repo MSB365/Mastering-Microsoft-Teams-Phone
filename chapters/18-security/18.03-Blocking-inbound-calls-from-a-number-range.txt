@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 18.3 - Blocking inbound calls from a number range
+# Chapter 18 - Security and Compliance  |  Section: 18.4 Inbound Calls and Caller ID
+# Book page: 216
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Block a range of numbers that generates nuisance calls
+New-CsInboundBlockedNumberPattern -Name "Block-Spam-Range" -Enabled $true `
+    -Description "Nuisance calls, ticket INC0012345" -Pattern "^\+4190012\d{4}$"
+
+# Make sure the blocking feature is active
+Set-CsTenantBlockedCallingNumbers -Enabled $true
+
+# Test before relying on it
+Test-CsInboundBlockedNumberPattern -PhoneNumber "+41900121234"

@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.5 - Checking number and effective policies of a user
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.8 Verifying a User
+# Book page: 106
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$upn = "anna.meier@contoso.com"
+
+Get-CsOnlineUser -Identity $upn |
+    Select-Object EnterpriseVoiceEnabled, LineUri, FeatureTypes, UsageLocation
+
+Get-CsPhoneNumberAssignment -AssignedPstnTargetId $upn |
+    Select-Object TelephoneNumber, NumberType, AssignmentCategory, PstnAssignmentStatus
+
+"OnlineVoiceRoutingPolicy","TenantDialPlan","TeamsCallingPolicy","CallingLineIdentity" |
+    ForEach-Object {
+        $a = Get-CsUserPolicyAssignment -Identity $upn -PolicyType $_
+        [pscustomobject]@{ PolicyType = $_; Policy = $a.PolicyName }
+    }

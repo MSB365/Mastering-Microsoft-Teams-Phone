@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 16.2 - Creating a CQD building file from the Teams network topology
+# Chapter 16 - Monitoring and Call Quality  |  Section: 16.6 Building Data
+# Book page: 195
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$sites = @{
+    "ZRH-HQ"  = @{ City = "Zurich"; Zip = "8001"; Country = "CH"; Region = "EMEA" }
+    "BER-OFF" = @{ City = "Berlin"; Zip = "10115"; Country = "DE"; Region = "EMEA" }
+}
+
+Get-CsTenantNetworkSubnet | ForEach-Object {
+    $s = $sites[$_.NetworkSiteID]
+    if (-not $s) { Write-Warning "No site data for $($_.NetworkSiteID)"; return }
+    ($_.SubnetID, "$($_.NetworkSiteID)/$($_.SubnetID)", $_.MaskBits, $_.NetworkSiteID,
+     "Contoso", "Office", "", $s.City, $s.Zip, $s.Country, "", $s.Region, 1, 0, 0) -join "`t"
+} | Set-Content .\cqd-building.tsv -Encoding UTF8

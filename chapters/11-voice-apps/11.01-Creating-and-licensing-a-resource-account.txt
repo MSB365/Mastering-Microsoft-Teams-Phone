@@ -1,0 +1,23 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 11.1 - Creating and licensing a resource account
+# Chapter 11 - Voice Applications  |  Section: 11.2 Resource Accounts
+# Book page: 130
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+Connect-MgGraph -Scopes "User.ReadWrite.All","Organization.Read.All"
+
+# Application IDs: auto attendant ce933385-9390-45d1-9512-c8d228074e07,
+#                  call queue     11cd3e2e-fccb-42ad-ad00-878b93575e07
+$ra = New-CsOnlineApplicationInstance -UserPrincipalName "cq-sales@contoso.com" `
+    -ApplicationId "11cd3e2e-fccb-42ad-ad00-878b93575e07" -DisplayName "Sales Queue"
+
+# Usage location and free Resource Account license
+Update-MgUser -UserId $ra.ObjectId -UsageLocation "CH"
+$sku = Get-MgSubscribedSku | Where-Object SkuPartNumber -eq "PHONESYSTEM_VIRTUALUSER"
+Set-MgUserLicense -UserId $ra.ObjectId -AddLicenses @(@{ SkuId = $sku.SkuId }) -RemoveLicenses @()

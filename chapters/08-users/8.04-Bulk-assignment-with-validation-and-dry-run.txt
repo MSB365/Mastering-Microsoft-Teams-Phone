@@ -1,0 +1,44 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.4 - Bulk assignment with validation and dry run
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.7 Bulk Assignment with Validation
+# Book page: 105
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+param([string]$CsvPath, [switch]$DryRun)
+
+$rows   = Import-Csv $CsvPath
+$result = foreach ($row in $rows) {
+    $issues = @()
+    $user = Get-CsOnlineUser -Identity $row.UPN -ErrorAction SilentlyContinue
+    if (-not $user) { $issues += "user not found" }
+    elseif ($user.FeatureTypes -notcontains "PhoneSystem") { $issues += "no Teams Phone" }
+
+    $num = Get-CsPhoneNumberAssignment -TelephoneNumber $row.Number -ErrorAction SilentlyContinue
+    if ($num -and $num.AssignedPstnTargetId) { $issues += "number already assigned" }
+
+    if ($row.VoiceRoutingPolicy -and
+        -not (Get-CsOnlineVoiceRoutingPolicy -Identity $row.VoiceRoutingPolicy -ErrorAction SilentlyContinue)) {
+        $issues += "voice routing policy not found"
+    }
+
+    $status = if ($issues) { "SKIPPED: " + ($issues -join "; ") }
+              elseif ($DryRun) { "OK (dry run)" }
+              else {
+                  try {
+                      Set-CsPhoneNumberAssignment -Identity $row.UPN -PhoneNumber $row.Number `
+                          -PhoneNumberType $row.NumberType -ErrorAction Stop
+                      if ($row.VoiceRoutingPolicy) {
+                          Grant-CsOnlineVoiceRoutingPolicy -Identity $row.UPN -PolicyName $row.VoiceRoutingPolicy
+                      }
+                      "OK"
+                  } catch { "ERROR: " + $_.Exception.Message }
+              }
+    [pscustomobject]@{ UPN = $row.UPN; Number = $row.Number; Status = $status }
+}
+$result | Export-Csv ($CsvPath -replace "\.csv$", "-result.csv") -NoTypeInformation
+$result | Group-Object { ($_.Status -split ":")[0] } | Select-Object Name, Count

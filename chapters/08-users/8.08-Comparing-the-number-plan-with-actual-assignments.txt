@@ -1,0 +1,23 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.8 - Comparing the number plan with actual assignments
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.11 Reporting and Reconciliation
+# Book page: 108
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$plan   = Import-Csv .\number-plan.csv          # columns: Number, UPN
+$actual = Get-CsPhoneNumberAssignment | Select-Object TelephoneNumber, AssignedPstnTargetId
+
+$diff = foreach ($row in $plan) {
+    $a = $actual | Where-Object TelephoneNumber -eq $row.Number
+    $assignedUpn = if ($a.AssignedPstnTargetId) {
+        (Get-CsOnlineUser -Identity $a.AssignedPstnTargetId).UserPrincipalName } else { "" }
+    if ($assignedUpn -ne $row.UPN) {
+        [pscustomobject]@{ Number = $row.Number; Plan = $row.UPN; Tenant = $assignedUpn }
+    }
+}
+$diff | Format-Table -AutoSize

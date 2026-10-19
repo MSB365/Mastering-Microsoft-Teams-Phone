@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.5 - PSTN calls and minutes by call type
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.5 PSTN and Direct Routing Logs
+# Book page: 168
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$uri = "https://graph.microsoft.com/v1.0/communications/callRecords/" +
+       "getPstnCalls(fromDateTime=$from,toDateTime=$to)"
+
+Get-GraphAll -Uri $uri | Group-Object callType | ForEach-Object {
+    [pscustomobject]@{
+        CallType = $_.Name
+        Calls    = $_.Count
+        Minutes  = [math]::Round(($_.Group | Measure-Object duration -Sum).Sum / 60)
+    }
+} | Sort-Object Minutes -Descending

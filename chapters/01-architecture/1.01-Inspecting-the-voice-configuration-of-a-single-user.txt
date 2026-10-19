@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 1.1 - Inspecting the voice configuration of a single user
+# Chapter 1 - Teams Phone Architecture  |  Section: 1.8 Where Configuration Lives: Users, Numbers and Policies
+# Book page: 19
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+$upn = "anna.meier@contoso.com"
+
+Get-CsOnlineUser -Identity $upn |
+    Select-Object DisplayName, UsageLocation, AccountEnabled,
+        EnterpriseVoiceEnabled, LineUri, FeatureTypes,
+        OnlineVoiceRoutingPolicy, TenantDialPlan,
+        TeamsCallingPolicy, CallingLineIdentity
+
+# Which dial plan is really in effect, and how does it normalize a number?
+Get-CsEffectiveTenantDialPlan -Identity $upn |
+    Test-CsEffectiveTenantDialPlan -DialedNumber "1234"

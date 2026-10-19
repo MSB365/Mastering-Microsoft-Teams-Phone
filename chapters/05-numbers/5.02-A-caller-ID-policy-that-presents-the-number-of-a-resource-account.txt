@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 5.2 - A caller ID policy that presents the number of a resource account
+# Chapter 5 - Number Planning and Migration  |  Section: 5.6 Caller ID
+# Book page: 68
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$ra = Get-CsOnlineApplicationInstance -Identity "aa-main@contoso.com"
+
+New-CsCallingLineIdentity -Identity "CLI-MainNumber" `
+    -Description "Show main number" `
+    -CallingIDSubstitute Resource -ResourceAccount $ra.ObjectId `
+    -EnableUserOverride $false
+
+Grant-CsCallingLineIdentity -Identity "sales.user@contoso.com" -PolicyName "CLI-MainNumber"

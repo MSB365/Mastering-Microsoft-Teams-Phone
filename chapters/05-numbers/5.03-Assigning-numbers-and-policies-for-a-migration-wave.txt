@@ -1,0 +1,32 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 5.3 - Assigning numbers and policies for a migration wave
+# Chapter 5 - Number Planning and Migration  |  Section: 5.8 Migrating from a Legacy PBX
+# Book page: 71
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+$log = @()
+Import-Csv .\wave-03.csv | ForEach-Object {
+    $row = $_
+    try {
+        Set-CsPhoneNumberAssignment -Identity $row.UPN -PhoneNumber $row.Number `
+            -PhoneNumberType $row.NumberType -ErrorAction Stop
+        if ($row.VoiceRoutingPolicy) {
+            Grant-CsOnlineVoiceRoutingPolicy -Identity $row.UPN -PolicyName $row.VoiceRoutingPolicy
+        }
+        if ($row.DialPlan) {
+            Grant-CsTenantDialPlan -Identity $row.UPN -PolicyName $row.DialPlan
+        }
+        $log += [pscustomobject]@{ UPN = $row.UPN; Number = $row.Number; Result = "OK" }
+    }
+    catch {
+        $log += [pscustomobject]@{ UPN = $row.UPN; Number = $row.Number; Result = $_.Exception.Message }
+    }
+}
+$log | Export-Csv .\wave-03-result.csv -NoTypeInformation

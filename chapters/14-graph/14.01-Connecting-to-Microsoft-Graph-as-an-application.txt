@@ -1,0 +1,15 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.1 - Connecting to Microsoft Graph as an application
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.2 App Registrations, Permissions and Consent
+# Book page: 165
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MgGraph -TenantId $TenantId -ClientId $AppId -CertificateThumbprint $Thumbprint
+
+# Which permissions does the current token have?
+(Get-MgContext).Scopes

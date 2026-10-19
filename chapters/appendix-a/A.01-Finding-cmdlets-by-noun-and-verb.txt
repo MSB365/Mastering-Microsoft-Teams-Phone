@@ -1,0 +1,13 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing A.1 - Finding cmdlets by noun and verb
+# Appendix A - PowerShell Cmdlet Reference
+# Book page: 274
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Get-Command -Module MicrosoftTeams -Noun *Emergency*
+Get-Command -Module MicrosoftTeams -Verb Grant | Measure-Object

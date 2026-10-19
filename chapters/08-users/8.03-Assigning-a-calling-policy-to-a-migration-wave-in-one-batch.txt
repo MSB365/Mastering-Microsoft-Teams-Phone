@@ -1,0 +1,17 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.3 - Assigning a calling policy to a migration wave in one batch
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.5 Policy Precedence and Assignment Methods
+# Book page: 103
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$users = Import-Csv .\wave-03.csv | Select-Object -ExpandProperty UPN
+
+$op = New-CsBatchPolicyAssignmentOperation -PolicyType TeamsCallingPolicy `
+    -PolicyName "CP-Standard" -Identity $users -OperationName "Wave 03 calling policy"
+
+Get-CsBatchPolicyAssignmentOperation -OperationId $op

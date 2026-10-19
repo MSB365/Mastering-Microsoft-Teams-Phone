@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.5 - Generating a Markdown overview of voice routes
+# Chapter 15 - Configuration as Code  |  Section: 15.7 Documentation from Code
+# Book page: 181
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$routes = Get-Content .\export\VoiceRoutes.json -Raw | ConvertFrom-Json
+
+$lines  = @("| Route | Priority | Pattern | Usages | Gateways |", "|---|---|---|---|---|")
+$lines += $routes | Sort-Object Priority | ForEach-Object {
+    "| {0} | {1} | ``{2}`` | {3} | {4} |" -f $_.Identity, $_.Priority, $_.NumberPattern,
+        ($_.OnlinePstnUsages -join ", "), ($_.OnlinePstnGatewayList -join ", ")
+}
+$lines | Set-Content .\docs\voice-routes.md -Encoding UTF8

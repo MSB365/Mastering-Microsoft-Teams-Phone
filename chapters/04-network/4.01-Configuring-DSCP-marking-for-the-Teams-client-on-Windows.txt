@@ -1,0 +1,25 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 4.1 - Configuring DSCP marking for the Teams client on Windows
+# Chapter 4 - Network Readiness  |  Section: 4.7 Quality of Service
+# Book page: 58
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Run as administrator; for production, deploy via Intune or Group Policy
+New-NetQosPolicy -Name "Teams Audio" -AppPathNameMatchCondition "ms-teams.exe" `
+    -IPProtocolMatchCondition Both -IPSrcPortStartMatchCondition 50000 `
+    -IPSrcPortEndMatchCondition 50019 -DSCPAction 46 -NetworkProfile All
+
+New-NetQosPolicy -Name "Teams Video" -AppPathNameMatchCondition "ms-teams.exe" `
+    -IPProtocolMatchCondition Both -IPSrcPortStartMatchCondition 50020 `
+    -IPSrcPortEndMatchCondition 50039 -DSCPAction 34 -NetworkProfile All
+
+New-NetQosPolicy -Name "Teams Sharing" -AppPathNameMatchCondition "ms-teams.exe" `
+    -IPProtocolMatchCondition Both -IPSrcPortStartMatchCondition 50040 `
+    -IPSrcPortEndMatchCondition 50059 -DSCPAction 18 -NetworkProfile All
+
+Get-NetQosPolicy | Select-Object Name, AppPathName, IPSrcPortStart, IPSrcPortEnd, DSCPAction

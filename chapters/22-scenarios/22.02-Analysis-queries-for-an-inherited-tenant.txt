@@ -1,0 +1,31 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 22.2 - Analysis queries for an inherited tenant
+# Chapter 22 - Real-World Scenarios  |  Section: 22.4 Scenario D: Cleaning Up an Inherited Tenant
+# Book page: 259
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$users = Get-CsOnlineUser -Filter 'EnterpriseVoiceEnabled -eq $true' `
+    -Properties UserPrincipalName, LineUri, FeatureTypes, OnlineVoiceRoutingPolicy, AccountEnabled `
+    -ResultSize Unlimited
+
+# 1. Voice-enabled users without the Teams Phone capability, or with disabled accounts
+$users | Where-Object { $_.FeatureTypes -notcontains 'PhoneSystem' -or -not $_.AccountEnabled } |
+    Select-Object UserPrincipalName, LineUri, AccountEnabled
+
+# 2. Voice routing policies assigned neither directly nor through a group
+$direct = $users.OnlineVoiceRoutingPolicy | ForEach-Object { [string]$_ } | Sort-Object -Unique
+$group  = Get-CsGroupPolicyAssignment -PolicyType OnlineVoiceRoutingPolicy |
+          Select-Object -ExpandProperty PolicyName -Unique
+Get-CsOnlineVoiceRoutingPolicy | ForEach-Object { $_.Identity -replace '^Tag:', '' } |
+    Where-Object { $_ -ne 'Global' -and $direct -notcontains $_ -and $group -notcontains $_ }
+
+# 3. PSTN usages used by routes but referenced by no policy
+$policyUsages = (Get-CsOnlineVoiceRoutingPolicy).OnlinePstnUsages | Sort-Object -Unique
+Get-CsOnlineVoiceRoute | Where-Object {
+    -not ($_.OnlinePstnUsages | Where-Object { $policyUsages -contains $_ })
+} | Select-Object Identity, NumberPattern, OnlinePstnUsages

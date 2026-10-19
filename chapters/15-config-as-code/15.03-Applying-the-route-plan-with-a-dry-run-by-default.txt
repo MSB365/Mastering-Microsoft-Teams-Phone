@@ -1,0 +1,37 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.3 - Applying the route plan with a dry run by default
+# Chapter 15 - Configuration as Code  |  Section: 15.4 Applying Changes in the Right Order
+# Book page: 179
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+function Invoke-VoiceRoutePlan {
+    param([Parameter(Mandatory)] $Plan, [Parameter(Mandatory)] $Desired, [switch]$Apply)
+
+    $order = @{ Create = 1; Update = 2; Remove = 3 }
+    foreach ($step in ($Plan | Where-Object Type -eq "Route" | Sort-Object { $order[$_.Action] })) {
+        $d = $Desired.voiceRoutes | Where-Object identity -eq $step.Name
+        $text = "{0} route {1} {2}" -f $step.Action, $step.Name, $step.Details
+        if (-not $Apply) { Write-Host "[dry run] $text"; continue }
+        try {
+            switch ($step.Action) {
+                "Create" { New-CsOnlineVoiceRoute -Identity $d.identity -NumberPattern $d.numberPattern `
+                               -Priority $d.priority -OnlinePstnGatewayList $d.gateways `
+                               -OnlinePstnUsages $d.pstnUsages -ErrorAction Stop | Out-Null }
+                "Update" { Set-CsOnlineVoiceRoute -Identity $d.identity -NumberPattern $d.numberPattern `
+                               -Priority $d.priority -OnlinePstnGatewayList $d.gateways `
+                               -OnlinePstnUsages $d.pstnUsages -ErrorAction Stop }
+                "Remove" { Remove-CsOnlineVoiceRoute -Identity $step.Name -ErrorAction Stop }
+            }
+            Write-Host "OK   $text"
+        } catch { Write-Warning "FAIL $text : $($_.Exception.Message)" }
+    }
+}
+
+$plan = Compare-VoiceRouting -Desired $desired
+Invoke-VoiceRoutePlan -Plan $plan -Desired $desired            # dry run
+# Invoke-VoiceRoutePlan -Plan $plan -Desired $desired -Apply   # after approval

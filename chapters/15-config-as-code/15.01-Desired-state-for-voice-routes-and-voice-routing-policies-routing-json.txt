@@ -1,0 +1,14 @@
+{
+  "voiceRoutes": [
+    { "identity": "CH-National", "numberPattern": "^\\+41\\d{9}$", "priority": 1,
+      "gateways": [ "sbc01.contoso.com", "sbc02.contoso.com" ],
+      "pstnUsages": [ "CH-National" ] },
+    { "identity": "International", "numberPattern": "^\\+\\d+$", "priority": 2,
+      "gateways": [ "sbc01.contoso.com", "sbc02.contoso.com" ],
+      "pstnUsages": [ "International" ] }
+  ],
+  "voiceRoutingPolicies": [
+    { "identity": "VRP-CH-National",      "pstnUsages": [ "CH-National" ] },
+    { "identity": "VRP-CH-International", "pstnUsages": [ "CH-National", "International" ] }
+  ]
+}

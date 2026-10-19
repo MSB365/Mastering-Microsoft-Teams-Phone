@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 7.1 - Assigning a Calling Plan number with an emergency location
+# Chapter 7 - Setting up Operator Connect and Calling Plans  |  Section: 7.2 Calling Plans
+# Book page: 92
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+# Find the emergency location (place) to use
+$loc = Get-CsOnlineLisLocation | Where-Object { $_.City -eq "Zurich" } |
+       Select-Object -First 1
+
+Set-CsPhoneNumberAssignment -Identity "anna.meier@contoso.com" `
+    -PhoneNumber "+41441234567" -PhoneNumberType CallingPlan `
+    -LocationId $loc.LocationId

@@ -1,0 +1,29 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.1 - Assigning numbers of different types
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.3 Assigning Phone Numbers
+# Book page: 100
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Direct Routing number
+Set-CsPhoneNumberAssignment -Identity "anna.meier@contoso.com" `
+    -PhoneNumber "+41441234567" -PhoneNumberType DirectRouting
+
+# Direct Routing number with extension
+Set-CsPhoneNumberAssignment -Identity "ben.keller@contoso.com" `
+    -PhoneNumber "+41441234500;ext=4501" -PhoneNumberType DirectRouting
+
+# Operator Connect number
+Set-CsPhoneNumberAssignment -Identity "carla.rossi@contoso.com" `
+    -PhoneNumber "+41441234568" -PhoneNumberType OperatorConnect
+
+# Calling Plan number with emergency location
+Set-CsPhoneNumberAssignment -Identity "david.huber@contoso.com" `
+    -PhoneNumber "+41441234569" -PhoneNumberType CallingPlan -LocationId $locId
+
+# Voice-enabled without a number (e.g. Shared Calling)
+Set-CsPhoneNumberAssignment -Identity "eva.frei@contoso.com" -EnterpriseVoiceEnabled $true

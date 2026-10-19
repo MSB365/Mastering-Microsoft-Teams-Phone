@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.4 - Creating a certificate and connecting as an application
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.4 Connecting
+# Book page: 153
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# 1. Create a self-signed certificate in the user store of the account running the script
+$cert = New-SelfSignedCertificate -Subject "CN=VoiceAutomation" `
+    -CertStoreLocation "Cert:\CurrentUser\My" -KeySpec Signature `
+    -KeyAlgorithm RSA -KeyLength 2048 -HashAlgorithm SHA256 `
+    -KeyExportPolicy NonExportable -NotAfter (Get-Date).AddYears(1)
+Export-Certificate -Cert $cert -FilePath .\VoiceAutomation.cer   # upload this to the app
+
+# 2. Connect with the certificate
+Connect-MicrosoftTeams -TenantId $TenantId -ApplicationId $AppId `
+    -CertificateThumbprint $cert.Thumbprint

@@ -1,0 +1,23 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.6 - Server-side filtering with Get-CsOnlineUser
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.6 Working Efficiently in Large Tenants
+# Book page: 155
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Voice-enabled users only, with a few properties
+Get-CsOnlineUser -Filter 'EnterpriseVoiceEnabled -eq $true' `
+    -Properties UserPrincipalName, LineUri, FeatureTypes -ResultSize Unlimited
+
+# Users with the Teams Phone capability
+Get-CsOnlineUser -Filter "FeatureTypes -contains 'PhoneSystem'" -ResultSize Unlimited
+
+# Who has a specific number?
+Get-CsOnlineUser -Filter {LineURI -eq "tel:+41441234567"}
+
+# Resource accounts only
+Get-CsOnlineUser -AccountType ResourceAccount

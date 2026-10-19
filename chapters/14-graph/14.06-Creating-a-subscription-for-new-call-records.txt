@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.6 - Creating a subscription for new call records
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.6 Change Notifications for Call Records
+# Book page: 169
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$body = @{
+    changeType         = "created"
+    notificationUrl    = "https://voice-collector.contoso.com/api/notify"
+    resource           = "/communications/callRecords"
+    expirationDateTime = (Get-Date).ToUniversalTime().AddMinutes(4200).ToString("o")
+    clientState        = "<random secret your endpoint checks>"
+} | ConvertTo-Json
+
+$sub = Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/v1.0/subscriptions" `
+    -Body $body -ContentType "application/json" -OutputType PSObject
+$sub.id, $sub.expirationDateTime

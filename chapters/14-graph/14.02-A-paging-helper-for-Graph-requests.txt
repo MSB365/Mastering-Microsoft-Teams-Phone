@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.2 - A paging helper for Graph requests
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.3 Calling Graph Reliably
+# Book page: 165
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+function Get-GraphAll {
+    param([Parameter(Mandatory)][string]$Uri)
+    $results = [System.Collections.Generic.List[object]]::new()
+    do {
+        $response = Invoke-MgGraphRequest -Method GET -Uri $Uri -OutputType PSObject
+        if ($response.value) { $results.AddRange([object[]]$response.value) }
+        $Uri = $response.'@odata.nextLink'
+    } while ($Uri)
+    $results
+}

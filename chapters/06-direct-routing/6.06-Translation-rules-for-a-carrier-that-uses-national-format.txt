@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.6 - Translation rules for a carrier that uses national format
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.5 Number Translation Rules
+# Book page: 83
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsTranslationRule -Identity "CH-E164-to-National" `
+    -Pattern '^\+41(\d{9})$' -Translation '0$1'
+
+New-CsTeamsTranslationRule -Identity "CH-0041-to-E164" `
+    -Pattern '^0041(\d{9})$' -Translation '+41$1'
+
+Set-CsOnlinePSTNGateway -Identity "sbc01.contoso.com" `
+    -OutboundPstnNumberTranslationRules @{ Add = "CH-E164-to-National" } `
+    -InboundPstnNumberTranslationRules  @{ Add = "CH-0041-to-E164" }

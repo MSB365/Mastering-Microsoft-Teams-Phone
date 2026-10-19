@@ -1,0 +1,25 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 14.3 - Reading a call record with sessions and segments
+# Chapter 14 - Microsoft Graph for Telephony  |  Section: 14.4 Call Records
+# Book page: 167
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$id  = "<call record id>"
+$uri = "https://graph.microsoft.com/v1.0/communications/callRecords/$id" +
+       "?`$expand=sessions(`$expand=segments)"
+$cr  = Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject
+
+"{0} call, {1} to {2}, modalities: {3}" -f $cr.type, $cr.startDateTime, $cr.endDateTime,
+    ($cr.modalities -join ", ")
+
+foreach ($s in $cr.sessions) {
+    foreach ($seg in $s.segments) {
+        "{0}  {1} -> {2}" -f $seg.startDateTime,
+            $seg.caller.userAgent.headerValue, $seg.callee.userAgent.headerValue
+    }
+}

@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 5.1 - Creating, assigning and testing a tenant dial plan
+# Chapter 5 - Number Planning and Migration  |  Section: 5.5 Dial Plans and Normalization Rules
+# Book page: 67
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+$rule = New-CsVoiceNormalizationRule -Parent Global -Name "ZH-Ext-4xxx" `
+    -Description "Zurich four-digit extensions" `
+    -Pattern '^(4\d{3})$' -Translation '+4144123$1' -InMemory
+
+New-CsTenantDialPlan -Identity "DP-CH-Zurich" -NormalizationRules @{ Add = $rule }
+
+Grant-CsTenantDialPlan -Identity "anna.meier@contoso.com" -PolicyName "DP-CH-Zurich"
+
+# Test the effective dial plan of the user
+Get-CsEffectiveTenantDialPlan -Identity "anna.meier@contoso.com" |
+    Test-CsEffectiveTenantDialPlan -DialedNumber "4567"

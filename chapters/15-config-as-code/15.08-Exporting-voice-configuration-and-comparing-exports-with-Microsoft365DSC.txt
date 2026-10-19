@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.8 - Exporting voice configuration and comparing exports with Microsoft365DSC
+# Chapter 15 - Configuration as Code  |  Section: 15.10 Microsoft365DSC and UTCM
+# Book page: 184
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Export selected Teams voice resources as a DSC configuration
+Export-M365DSCConfiguration -Components @("TeamsVoiceRoute", "TeamsVoiceRoutingPolicy", "TeamsCallingPolicy") `
+    -ApplicationId $AppId -TenantId "contoso.onmicrosoft.com" `
+    -CertificateThumbprint $Thumbprint -Path .\m365dsc
+
+# Compare two exports and produce a report
+New-M365DSCDeltaReport -Source .\m365dsc-old\M365TenantConfig.ps1 `
+    -Destination .\m365dsc\M365TenantConfig.ps1 -OutputPath .\delta.html

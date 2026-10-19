@@ -1,0 +1,51 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 15.2 - Comparing the desired and actual routing configuration
+# Chapter 15 - Configuration as Code  |  Section: 15.3 Comparing Desired and Actual State
+# Book page: 177
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+function Compare-VoiceRouting {
+    param([Parameter(Mandatory)] $Desired)
+
+    # Voice routes: gateway and usage order within a route does not matter
+    $actualRoutes = @{}
+    Get-CsOnlineVoiceRoute | ForEach-Object { $actualRoutes[$_.Identity] = $_ }
+    foreach ($d in $Desired.voiceRoutes) {
+        $a = $actualRoutes[$d.identity]
+        if (-not $a) { [pscustomobject]@{ Type="Route"; Action="Create"; Name=$d.identity; Details="" }; continue }
+        $diff = @()
+        if ($a.NumberPattern -ne $d.numberPattern) { $diff += "NumberPattern" }
+        if ($a.Priority -ne $d.priority)           { $diff += "Priority" }
+        if ((@($a.OnlinePstnGatewayList | Sort-Object) -join ",") -ne
+            (@($d.gateways | Sort-Object) -join ","))  { $diff += "Gateways" }
+        if ((@($a.OnlinePstnUsages | Sort-Object) -join ",") -ne
+            (@($d.pstnUsages | Sort-Object) -join ",")) { $diff += "PstnUsages" }
+        if ($diff) { [pscustomobject]@{ Type="Route"; Action="Update"; Name=$d.identity; Details=($diff -join ", ") } }
+    }
+    foreach ($name in $actualRoutes.Keys) {
+        if ($Desired.voiceRoutes.identity -notcontains $name) {
+            [pscustomobject]@{ Type="Route"; Action="Remove"; Name=$name; Details="" }
+        }
+    }
+
+    # Voice routing policies: the order of PSTN usages DOES matter
+    $actualPolicies = @{}
+    Get-CsOnlineVoiceRoutingPolicy | ForEach-Object {
+        $actualPolicies[($_.Identity -replace "^Tag:", "")] = $_
+    }
+    foreach ($d in $Desired.voiceRoutingPolicies) {
+        $a = $actualPolicies[$d.identity]
+        if (-not $a) { [pscustomobject]@{ Type="Policy"; Action="Create"; Name=$d.identity; Details="" }; continue }
+        if ((@($a.OnlinePstnUsages) -join ",") -ne (@($d.pstnUsages) -join ",")) {
+            [pscustomobject]@{ Type="Policy"; Action="Update"; Name=$d.identity; Details="PstnUsages (order)" }
+        }
+    }
+}
+
+$desired = Get-Content .\desired\routing.json -Raw | ConvertFrom-Json
+Compare-VoiceRouting -Desired $desired | Format-Table -AutoSize

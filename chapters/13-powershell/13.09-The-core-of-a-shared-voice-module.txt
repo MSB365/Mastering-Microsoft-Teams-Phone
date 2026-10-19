@@ -1,0 +1,42 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 13.9 - The core of a shared voice module
+# Chapter 13 - Teams PowerShell for Voice Administrators  |  Section: 13.8 Building a Script Library
+# Book page: 159
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# VoiceTools.psm1
+function Connect-VoiceTenant {
+    param([ValidateSet("Interactive","Certificate","ManagedIdentity")] [string]$Mode = "Interactive",
+          [string]$TenantId, [string]$AppId, [string]$Thumbprint)
+    switch ($Mode) {
+        "Interactive"     { Connect-MicrosoftTeams | Out-Null }
+        "Certificate"     { Connect-MicrosoftTeams -TenantId $TenantId -ApplicationId $AppId `
+                                -CertificateThumbprint $Thumbprint | Out-Null }
+        "ManagedIdentity" { Connect-MicrosoftTeams -Identity | Out-Null }
+    }
+}
+
+function Write-VoiceLog {
+    param([string]$Path, [string]$Action, [string]$Target, [string]$Result)
+    [pscustomobject]@{ Time = (Get-Date).ToString("s"); Action = $Action;
+                       Target = $Target; Result = $Result } |
+        Export-Csv -Path $Path -Append -NoTypeInformation
+}
+
+function Invoke-VoiceRetry {
+    param([scriptblock]$Script, [int]$MaxAttempts = 4)
+    for ($i = 1; $i -le $MaxAttempts; $i++) {
+        try { return & $Script }
+        catch {
+            if ($i -eq $MaxAttempts) { throw }
+            Start-Sleep -Seconds ([math]::Pow(2, $i))
+        }
+    }
+}
+
+Export-ModuleMember -Function Connect-VoiceTenant, Write-VoiceLog, Invoke-VoiceRetry

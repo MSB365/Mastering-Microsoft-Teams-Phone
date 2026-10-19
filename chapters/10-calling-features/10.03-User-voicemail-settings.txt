@@ -1,0 +1,17 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.3 - User voicemail settings
+# Chapter 10 - Calling Features  |  Section: 10.3 Voicemail
+# Book page: 122
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Disable voicemail for a common area or lobby phone
+Set-CsOnlineVoicemailUserSettings -Identity "lobby-phone@contoso.com" -VoicemailEnabled $false
+
+# Let callers leave a message or transfer, e.g. to the reception
+Set-CsOnlineVoicemailUserSettings -Identity "anna.meier@contoso.com" `
+    -CallAnswerRules VoicemailWithTransferOption -TransferTarget "+41441234500"

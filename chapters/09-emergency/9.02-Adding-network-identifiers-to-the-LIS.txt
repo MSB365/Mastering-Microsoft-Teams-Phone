@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 9.2 - Adding network identifiers to the LIS
+# Chapter 9 - Emergency Calling  |  Section: 9.4 Dynamic Emergency Calling
+# Book page: 114
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$loc = (Get-CsOnlineLisLocation | Where-Object { $_.Location -eq "3rd floor" }).LocationId
+
+# Subnet (network ID as calculated from client IP and prefix length)
+Set-CsOnlineLisSubnet -Subnet "10.10.3.0" -LocationId $loc -Description "ZH 3rd floor"
+
+# Wireless access point by BSSID
+Set-CsOnlineLisWirelessAccessPoint -BSSID "F0-6E-0B-C2-03-23" -LocationId $loc -Description "ZH-AP-301"
+
+# Switch and switch port
+Set-CsOnlineLisSwitch -ChassisID "B8-BE-BF-4A-A3-00" -LocationId $loc -Description "ZH-SW-3"
+Set-CsOnlineLisPort -ChassisID "B8-BE-BF-4A-A3-00" -PortID "G1/0/12" -LocationId $loc

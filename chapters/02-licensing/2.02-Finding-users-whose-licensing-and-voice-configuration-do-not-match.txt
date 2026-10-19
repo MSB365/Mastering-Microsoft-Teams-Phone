@@ -1,0 +1,26 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 2.2 - Finding users whose licensing and voice configuration do not match
+# Chapter 2 - Licensing Demystified  |  Section: 2.9 Assigning and Checking Licenses at Scale
+# Book page: 34
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+$users = Get-CsOnlineUser -ResultSize Unlimited |
+    Select-Object UserPrincipalName, LineUri, EnterpriseVoiceEnabled, FeatureTypes
+
+# Phone number assigned, but no Teams Phone capability
+$broken = $users | Where-Object {
+    $_.LineUri -and ($_.FeatureTypes -notcontains "PhoneSystem") }
+
+# Teams Phone capability, but not voice-enabled
+$unused = $users | Where-Object {
+    ($_.FeatureTypes -contains "PhoneSystem") -and -not $_.EnterpriseVoiceEnabled }
+
+$broken | Export-Csv .\voice-broken.csv -NoTypeInformation
+$unused | Export-Csv .\voice-unused.csv -NoTypeInformation

@@ -1,0 +1,20 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.3 - Creating voice routes
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.4 Configuring Voice Routing
+# Book page: 81
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsOnlineVoiceRoute -Identity "CH-National" `
+    -NumberPattern '^\+41\d{9}$' `
+    -OnlinePstnGatewayList "sbc01.contoso.com", "sbc02.contoso.com" `
+    -Priority 1 -OnlinePstnUsages "CH-National"
+
+New-CsOnlineVoiceRoute -Identity "International" `
+    -NumberPattern '^\+\d+$' `
+    -OnlinePstnGatewayList "sbc01.contoso.com", "sbc02.contoso.com" `
+    -Priority 2 -OnlinePstnUsages "International"

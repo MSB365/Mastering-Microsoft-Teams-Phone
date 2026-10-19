@@ -1,0 +1,15 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.6 - A call park policy for the warehouse team
+# Chapter 10 - Calling Features  |  Section: 10.7 Call Park
+# Book page: 124
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+New-CsTeamsCallParkPolicy -Identity "CPP-Warehouse" -AllowCallPark $true `
+    -PickupRangeStart 100 -PickupRangeEnd 199 -ParkTimeoutSeconds 600
+
+Grant-CsTeamsCallParkPolicy -Group "warehouse@contoso.com" -PolicyName "CPP-Warehouse" -Rank 10

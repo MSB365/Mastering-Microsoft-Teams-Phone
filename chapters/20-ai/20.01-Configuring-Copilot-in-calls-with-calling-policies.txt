@@ -1,0 +1,21 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 20.1 - Configuring Copilot in calls with calling policies
+# Chapter 20 - AI in Teams Phone  |  Section: 20.2 Copilot in Calls
+# Book page: 236
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Copilot during calls only: Copilot on, call transcription off
+Set-CsTeamsCallingPolicy -Identity "CP-Copilot-LiveOnly" -Copilot Enabled `
+    -AllowTranscriptionForCalling $false
+
+# Copilot with a saved transcript required
+Set-CsTeamsCallingPolicy -Identity "CP-Copilot-Transcript" -Copilot EnabledWithTranscript `
+    -AllowTranscriptionForCalling $true
+
+# No Copilot in calls
+Set-CsTeamsCallingPolicy -Identity "CP-NoCopilot" -Copilot Disabled

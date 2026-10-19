@@ -1,0 +1,19 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 11.2 - Creating a call queue and associating its resource account
+# Chapter 11 - Voice Applications  |  Section: 11.7 Building Voice Applications with PowerShell
+# Book page: 134
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$group = Get-MgGroup -Filter "displayName eq 'Sales Agents'"
+
+$cq = New-CsCallQueue -Name "Sales" -LanguageId "de-CH" `
+    -RoutingMethod LongestIdle -AgentAlertTime 30 -AllowOptOut $true `
+    -ConferenceMode $true -DistributionLists @($group.Id)
+
+New-CsOnlineApplicationInstanceAssociation -Identities @($ra.ObjectId) `
+    -ConfigurationId $cq.Identity -ConfigurationType CallQueue

@@ -1,0 +1,17 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.7 - Custom music on hold
+# Chapter 10 - Calling Features  |  Section: 10.9 Music on Hold
+# Book page: 125
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$bytes = [System.IO.File]::ReadAllBytes("C:\Audio\contoso-hold.mp3")
+$file  = Import-CsOnlineAudioFile -ApplicationId "TenantGlobal" `
+            -FileName "contoso-hold.mp3" -Content $bytes
+
+New-CsTeamsCallHoldPolicy -Identity "Hold-Contoso" -AudioFileId $file.Id
+Grant-CsTeamsCallHoldPolicy -Group "voice-users@contoso.com" -PolicyName "Hold-Contoso" -Rank 10

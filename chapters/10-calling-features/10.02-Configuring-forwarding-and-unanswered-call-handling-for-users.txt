@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.2 - Configuring forwarding and unanswered call handling for users
+# Chapter 10 - Calling Features  |  Section: 10.2 Forwarding, Simultaneous Ring and Unanswered Calls
+# Book page: 121
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# Forward all calls immediately to an external number
+Set-CsUserCallingSettings -Identity "anna.meier@contoso.com" `
+    -IsForwardingEnabled $true -ForwardingType Immediate `
+    -ForwardingTargetType SingleTarget -ForwardingTarget "+41791234567"
+
+# Send unanswered calls to voicemail after 20 seconds
+Set-CsUserCallingSettings -Identity "ben.keller@contoso.com" `
+    -IsUnansweredEnabled $true -UnansweredTargetType Voicemail `
+    -UnansweredDelay 00:00:20
+
+Get-CsUserCallingSettings -Identity "ben.keller@contoso.com"

@@ -1,0 +1,24 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 4.2 - Creating a network region, site, subnets and a trusted IP
+# Chapter 4 - Network Readiness  |  Section: 4.9 Network Topology in the Teams Admin Center
+# Book page: 60
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Connect-MicrosoftTeams
+
+New-CsTenantNetworkRegion -NetworkRegionID "Europe"
+New-CsTenantNetworkSite   -NetworkSiteID "Zurich" -NetworkRegionID "Europe"
+
+New-CsTenantNetworkSubnet -SubnetID "10.10.0.0" -MaskBits 24 -NetworkSiteID "Zurich"
+New-CsTenantNetworkSubnet -SubnetID "10.10.1.0" -MaskBits 24 -NetworkSiteID "Zurich"
+
+# Public egress address of the corporate network
+New-CsTenantTrustedIPAddress -IPAddress "198.51.100.10" -MaskBits 32 `
+    -Description "Zurich internet breakout"
+
+Get-CsTenantNetworkSubnet | Select-Object SubnetID, MaskBits, NetworkSiteID

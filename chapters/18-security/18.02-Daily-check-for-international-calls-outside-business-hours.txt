@@ -1,0 +1,26 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 18.2 - Daily check for international calls outside business hours
+# Chapter 18 - Security and Compliance  |  Section: 18.3 Toll Fraud
+# Book page: 215
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$from = (Get-Date).ToUniversalTime().AddDays(-1).ToString("yyyy-MM-dd")
+$to   = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd")
+$uri  = "https://graph.microsoft.com/v1.0/communications/callRecords/" +
+        "getDirectRoutingCalls(fromDateTime=$from,toDateTime=$to)"
+$tz   = [TimeZoneInfo]::FindSystemTimeZoneById("Europe/Zurich")
+
+$suspicious = Get-GraphAll -Uri $uri | Where-Object {
+    $local = [TimeZoneInfo]::ConvertTimeFromUtc(([datetime]$_.startDateTime).ToUniversalTime(), $tz)
+    $_.callType -eq "ByotOut" -and $_.successfulCall -and
+    $_.calleeNumber -notlike "+41*" -and
+    ($local.Hour -lt 7 -or $local.Hour -ge 20 -or $local.DayOfWeek -in "Saturday","Sunday")
+}
+
+$suspicious | Group-Object userPrincipalName | Sort-Object Count -Descending |
+    Select-Object Count, Name, @{ n = "Minutes"; e = { [math]::Round(($_.Group | Measure-Object duration -Sum).Sum / 60) } }

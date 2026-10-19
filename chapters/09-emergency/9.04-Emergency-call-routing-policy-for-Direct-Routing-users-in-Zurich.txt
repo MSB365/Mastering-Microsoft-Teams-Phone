@@ -1,0 +1,26 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 9.4 - Emergency call routing policy for Direct Routing users in Zurich
+# Chapter 9 - Emergency Calling  |  Section: 9.5 Emergency Policies
+# Book page: 116
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+# PSTN usage and route for emergency calls via the local SBC
+Set-CsOnlinePstnUsage -Identity Global -Usage @{ Add = "Emergency-CH" }
+New-CsOnlineVoiceRoute -Identity "Emergency-CH-ZH" -NumberPattern '^(112|117|118|144)$' `
+    -OnlinePstnGatewayList "sbc01.contoso.com" -Priority 1 -OnlinePstnUsages "Emergency-CH"
+
+$e112 = New-CsTeamsEmergencyNumber -EmergencyDialString "112" -OnlinePSTNUsage "Emergency-CH"
+$e117 = New-CsTeamsEmergencyNumber -EmergencyDialString "117" -OnlinePSTNUsage "Emergency-CH"
+$e118 = New-CsTeamsEmergencyNumber -EmergencyDialString "118" -OnlinePSTNUsage "Emergency-CH"
+$e144 = New-CsTeamsEmergencyNumber -EmergencyDialString "144" -OnlinePSTNUsage "Emergency-CH"
+
+New-CsTeamsEmergencyCallRoutingPolicy -Identity "ECRP-CH-Zurich" `
+    -EmergencyNumbers @{ Add = $e112, $e117, $e118, $e144 } `
+    -AllowEnhancedEmergencyServices $true
+
+Set-CsTenantNetworkSite -Identity "Zurich" -EmergencyCallRoutingPolicy "ECRP-CH-Zurich"

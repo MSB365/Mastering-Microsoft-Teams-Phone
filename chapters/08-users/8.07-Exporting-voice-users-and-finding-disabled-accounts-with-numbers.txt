@@ -1,0 +1,28 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 8.7 - Exporting voice users and finding disabled accounts with numbers
+# Chapter 8 - Enabling Users for Voice  |  Section: 8.11 Reporting and Reconciliation
+# Book page: 107
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$users = Get-CsOnlineUser -Filter 'EnterpriseVoiceEnabled -eq $true' -ResultSize Unlimited
+
+$report = foreach ($u in $users) {
+    [pscustomobject]@{
+        UPN           = $u.UserPrincipalName
+        Enabled       = $u.AccountEnabled
+        LineUri       = $u.LineUri
+        PhoneSystem   = $u.FeatureTypes -contains "PhoneSystem"
+        VoiceRouting  = $u.OnlineVoiceRoutingPolicy
+        DialPlan      = $u.TenantDialPlan
+        CallingPolicy = $u.TeamsCallingPolicy
+    }
+}
+$report | Export-Csv .\voice-users.csv -NoTypeInformation
+
+# Disabled accounts that still hold a number
+$report | Where-Object { -not $_.Enabled -and $_.LineUri }

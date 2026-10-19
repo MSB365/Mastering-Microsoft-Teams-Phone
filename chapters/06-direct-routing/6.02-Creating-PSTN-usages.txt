@@ -1,0 +1,15 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 6.2 - Creating PSTN usages
+# Chapter 6 - Direct Routing in Depth  |  Section: 6.4 Configuring Voice Routing
+# Book page: 81
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+Set-CsOnlinePstnUsage -Identity Global -Usage @{ Add = "CH-National" }
+Set-CsOnlinePstnUsage -Identity Global -Usage @{ Add = "International" }
+
+(Get-CsOnlinePstnUsage).Usage

@@ -1,0 +1,22 @@
+# ==========================================================================
+# Mastering Microsoft Teams Phone  |  Drago Petrovic
+# Listing 10.8 - A compact view of a user's call handling
+# Chapter 10 - Calling Features  |  Section: 10.12 Supporting Users
+# Book page: 126
+#
+# Provided as-is, without warranty. Test in a non-production tenant first.
+# Replace variables such as $upn, $TenantId or $AppId with values from your environment.
+# To run it, save the file with the extension .ps1.
+# ==========================================================================
+
+$upn = "anna.meier@contoso.com"
+$s = Get-CsUserCallingSettings -Identity $upn
+
+[pscustomobject]@{
+    Forwarding        = if ($s.IsForwardingEnabled) { "$($s.ForwardingType) -> $($s.ForwardingTarget)" } else { "off" }
+    Unanswered        = if ($s.IsUnansweredEnabled) { "$($s.UnansweredTargetType) after $($s.UnansweredDelay)" } else { "off" }
+    CallGroupOrder    = $s.CallGroupOrder
+    CallGroupTargets  = ($s.CallGroupTargets -join ", ")
+    Delegates         = ($s.Delegates.Id -join ", ")
+    CallingPolicy     = (Get-CsUserPolicyAssignment -Identity $upn -PolicyType TeamsCallingPolicy).PolicyName
+} | Format-List
